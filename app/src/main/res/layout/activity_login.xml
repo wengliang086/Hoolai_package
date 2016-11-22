@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <fragment
+        android:id="@+id/id_toolbar_fragment"
+        android:name="com.android.hoolai.pack.fragment.ToolbarFragment"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/toolbar_height"
+        tools:layout="@layout/fragment_toolbar" />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:hint="用户名"
+        android:text="liyongxiang" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:hint="密码"
+        android:inputType="textPassword"
+        android:text="0okmnhy6" />
+
+    <com.gc.materialdesign.views.ButtonRectangle
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="登录" />
+
+</LinearLayout>
