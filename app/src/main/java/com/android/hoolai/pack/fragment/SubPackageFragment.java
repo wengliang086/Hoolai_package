@@ -1,6 +1,5 @@
 package com.android.hoolai.pack.fragment;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +15,9 @@ import android.widget.TextView;
 
 import com.android.hoolai.pack.R;
 import com.android.hoolai.pack.domain.Package;
-import com.android.hoolai.pack.service.HoolaiServiceCreater;
+import com.android.hoolai.pack.service.HoolaiHttpMethods;
+import com.android.hoolai.pack.service.ObserverOnNextListener;
 import com.android.hoolai.pack.utils.LogUtil;
-import com.android.hoolai.pack.utils.ProgressDialogUtil;
 import com.android.hoolai.pack.utils.T;
 import com.android.hoolai.pack.utils.UpdateService;
 import com.liulishuo.filedownloader.BaseDownloadTask;
@@ -28,10 +26,6 @@ import com.liulishuo.filedownloader.FileDownloader;
 
 import java.io.File;
 import java.util.List;
-
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2016/5/31.
@@ -59,28 +53,13 @@ public class SubPackageFragment extends Fragment {
     }
 
     private void initData(final LayoutInflater inflater) {
-        final ProgressDialog dialog = ProgressDialogUtil.show(getActivity());
-        HoolaiServiceCreater.create().getPackageList(productId, mTitle)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Package>>() {
-                    @Override
-                    public void onCompleted() {
-                        ProgressDialogUtil.dismiss(dialog);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        ProgressDialogUtil.dismiss(dialog);
-                        LogUtil.e(e.getMessage(), e);
-                    }
-
-                    @Override
-                    public void onNext(List<Package> packages) {
-                        mDataSet = packages;
-                        afterCreateView(inflater);
-                    }
-                });
+        HoolaiHttpMethods.getInstance().getPackageList(getActivity(), new ObserverOnNextListener<List<Package>>() {
+            @Override
+            public void onNext(List<Package> packages) {
+                mDataSet = packages;
+                afterCreateView(inflater);
+            }
+        }, productId, mTitle);
     }
 
     private void afterCreateView(final LayoutInflater inflater) {
@@ -133,7 +112,7 @@ public class SubPackageFragment extends Fragment {
     }
 
     private void downloadApk(String url, String name) {
-        String completeUrl = HoolaiServiceCreater.getDownLoadUrl(url);
+        String completeUrl = HoolaiHttpMethods.getInstance().getDownLoadUrl(url);
         LogUtil.i(completeUrl);
 
         Intent intent = new Intent();
@@ -145,7 +124,7 @@ public class SubPackageFragment extends Fragment {
     }
 
     private void downloadApk2(String url, String name) {
-        String completeUrl = HoolaiServiceCreater.getDownLoadUrl(url);
+        String completeUrl = HoolaiHttpMethods.getInstance().getDownLoadUrl(url);
         LogUtil.i(completeUrl);
 
 //        completeUrl = "http://pkg.fir.im/bd272d971b8922fe48736ba9f30a67d862753aad?attname=app-debug.apk_1.0.apk&e=1465283476&token=LOvmia8oXF4xnLh0IdH05XMYpH6ENHNpARlmPc-T:F_GGmZ4uL31esyq0jYYnRxCrwKs=";

@@ -14,10 +14,9 @@ import android.view.ViewGroup;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.android.hoolai.pack.GlobalContext;
 import com.android.hoolai.pack.R;
 import com.android.hoolai.pack.activity.AccountListActivity;
-import com.android.hoolai.pack.service.HoolaiServiceCreater;
+import com.android.hoolai.pack.service.HoolaiHttpMethods;
 
 /**
  * Created by Administrator on 2016/6/6.
@@ -65,10 +64,10 @@ public class ToolbarFragment extends Fragment {
         new MaterialDialog.Builder(activity)
                 .title("网络选择")
                 .items("开发环境", "测试环境")
-                .itemsCallbackSingleChoice(HoolaiServiceCreater.getBaseUrlIndex(), new MaterialDialog.ListCallbackSingleChoice() {
+                .itemsCallbackSingleChoice(HoolaiHttpMethods.getInstance().getBaseUrlIndex(), new MaterialDialog.ListCallbackSingleChoice() {
                     @Override
                     public boolean onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
-                        HoolaiServiceCreater.setBaseUrl(which);
+                        HoolaiHttpMethods.getInstance().setBaseUrl(which);
                         return true;
                     }
                 })

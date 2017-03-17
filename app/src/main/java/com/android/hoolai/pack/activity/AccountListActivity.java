@@ -1,27 +1,24 @@
 package com.android.hoolai.pack.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.hoolai.pack.GlobalContext;
 import com.android.hoolai.pack.MainActivity;
 import com.android.hoolai.pack.R;
 import com.android.hoolai.pack.domain.LoginUser;
-import com.android.hoolai.pack.service.HoolaiServiceCreater;
+import com.android.hoolai.pack.service.HoolaiHttpMethods;
+import com.android.hoolai.pack.service.ObserverOnNextListener;
 import com.android.hoolai.pack.user.UserConfig;
-import com.android.hoolai.pack.utils.ProgressDialogUtil;
 import com.hoolai.access.greendao.bean.DbUser;
 import com.hoolai.access.greendao.dao.DbUserDao;
 
@@ -29,9 +26,6 @@ import java.util.Date;
 import java.util.List;
 
 import de.greenrobot.dao.query.Query;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by Administrator on 2016/6/22.
@@ -141,33 +135,17 @@ public class AccountListActivity extends Activity implements View.OnClickListene
     }
 
     public static void doLogin(final Activity activity, final String userName, final String password, final boolean close) {
-        final ProgressDialog dialog = ProgressDialogUtil.show(activity);
-        HoolaiServiceCreater.create().login(userName, password)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<LoginUser>() {
-                    @Override
-                    public void onCompleted() {
-                        ProgressDialogUtil.dismiss(dialog);
-                        if (close) {
-                            activity.finish();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        ProgressDialogUtil.dismiss(dialog);
-                        Log.e("onError", "onError", e);
-                        Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onNext(LoginUser user) {
-                        addAccount(userName, password);
-                        UserConfig.setCurrentUser(user);
-                        MainActivity.onSwitchProduct(activity);
-                    }
-                });
+        HoolaiHttpMethods.getInstance().login(activity, new ObserverOnNextListener<LoginUser>() {
+            @Override
+            public void onNext(LoginUser loginUser) {
+                addAccount(userName, password);
+                UserConfig.setCurrentUser(loginUser);
+                MainActivity.onSwitchProduct(activity);
+                if (close) {
+                    activity.finish();
+                }
+            }
+        }, userName, password);
     }
 
     private static void addAccount(String name, String pwd) {

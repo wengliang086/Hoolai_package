@@ -8,9 +8,9 @@ import com.android.hoolai.pack.domain.Version;
 
 import java.util.List;
 
+import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
-import rx.Observable;
 
 /**
  * Created by Administrator on 2016/5/27.
